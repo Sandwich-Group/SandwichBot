@@ -1,0 +1,13 @@
+# Build directories
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+
+# IDE-specific folders
+.idea/
+.vs/
+
+# IDE-specific files
+*.suo
+*.DotSettings.user
