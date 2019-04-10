@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SandwichBot\SandwichBot.csproj" />
+      <ProjectReference Include="..\SandwichBot.Commands\SandwichBot.Commands.csproj" />
     </ItemGroup>
 
 </Project>
