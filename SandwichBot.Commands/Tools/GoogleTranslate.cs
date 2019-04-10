@@ -61,7 +61,7 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
         internal static string GenerateToken(string inputString, string tkk)
         {
             string[] tkkSplit = tkk.Split('.');
-            int tkkFirst = Convert.ToInt32(tkkSplit[0]);
+            long tkkFirst = Convert.ToInt64(tkkSplit[0]);
             var crypted = new List<int>();
             for (var i = 0; i < inputString.Length; i++) {
                 int c = inputString[i];
@@ -90,17 +90,17 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
                 param = evalKey(param + i, "+-a^+6");
             }
             param = evalKey(param, "+-3^+b+-f");
-            param ^= Convert.ToInt32(tkkSplit[1]);
+            param ^= Convert.ToInt64(tkkSplit[1]);
             uint newParam = (uint)param;
             newParam %= 1000000;
             return newParam + "." + (newParam ^ tkkFirst);
 
-            int evalKey(int input, string key) {
+            long evalKey(long input, string key) {
                 Debug.WriteLine("=== " + input);
                 for (int i = 0; i < key.Length - 2; i += 3) {
                     char d1 = key[i + 2];
-                    int d = 'a' <= d1 ? d1 - 0x57 : Convert.ToInt32(d1.ToString());
-                    d = '+' == key[i + 1] ? (int)((uint)input >> d) : input << d;
+                    int d2 = 'a' <= d1 ? d1 - 0x57 : Convert.ToInt32(d1.ToString());
+                    long d = '+' == key[i + 1] ? (int)((uint)input >> d2) : input << d2;
 
                     input = '+' == key[i] ? (int)(input + d & 0xFFFFFFFF) : input ^ d;
                 }
