@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -44,7 +45,7 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
             string token = GenerateToken(query, cachedTtk);
 
             string dt = string.Join("&", new [] { "at", "bd", "ex", "ld", "md", "qca", "rw", "rm", "ss", "t" }.Select(x => $"dt={x}"));
-            string queryString = $"?client=webapp&sl={from}&th={to}&hl={to}&{dt}&otf=2&ssel=0&tsel=0&kc=2&tk={token}&q={query}";
+            string queryString = $"?client=webapp&sl={from}&th={to}&hl={to}&{dt}&otf=2&ssel=0&tsel=0&kc=2&tk={token}&q={HttpUtility.UrlEncode(query)}";
 
             string jsonData = await new WebClient().DownloadStringTaskAsync(ApiEndpoint + queryString);
             var data = (JArray)JsonConvert.DeserializeObject(jsonData);
