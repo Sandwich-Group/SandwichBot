@@ -45,12 +45,11 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
             string token = GenerateToken(query, cachedTtk);
 
             string dt = string.Join("&", new [] { "at", "bd", "ex", "ld", "md", "qca", "rw", "rm", "ss", "t" }.Select(x => $"dt={x}"));
-            string queryString = $"?client=webapp&sl={from}&th={to}&hl={to}&{dt}&otf=2&ssel=0&tsel=0&kc=2&tk={token}&q={HttpUtility.UrlEncode(query)}";
+            string queryString = $"?client=webapp&sl={from}&th={to}&hl={to}&{dt}&source=bh&ssel=0&tsel=0&kc=1&tk={token}&q={HttpUtility.UrlEncode(query)}";
 
             string jsonData = await new WebClient().DownloadStringTaskAsync(ApiEndpoint + queryString);
             var data = (JArray)JsonConvert.DeserializeObject(jsonData);
-            var y = (JValue)data[0][0][0];
-            return (string)y.Value;
+            return string.Join(string.Empty, data[0].Select(x => ((JValue)x[0]).Value.ToString()));
         }
 
         private static async Task<string> DownloadTTK()
