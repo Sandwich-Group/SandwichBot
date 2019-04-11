@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using HoLLy.DiscordBot.Commands;
@@ -27,14 +28,28 @@ namespace HoLLy.DiscordBot.Sandwich
             return GoogleTranslate.Translate(src).Result;
         }
 
+        [Command("tts", "Transforms a piece of text into an audio file")]
+        public static void TextToSpeech([DI] SocketMessage msg, string src)
+        {
+            byte[] bytes;
+            string lang;
+            int idx = src.IndexOf(' ');
+            if (idx > 0 && idx != src.Length - 1 && GoogleTranslate.SupportsLanguage(lang = src.Substring(0, idx)))
+                bytes = GoogleTranslate.TextToSpeech(src.Substring(idx + 1), lang).Result;
+            else
+                bytes = GoogleTranslate.TextToSpeech(src).Result;
+
+            msg.Channel.SendFileAsync(new MemoryStream(bytes), "audio.mp3").Wait();
+        }
+
         [Command(200, "stop")]
         public static void StopBot([DI] DiscordSocketClient cl)
         {
-            cl.StopAsync().Wait();
             cl.Disconnected += ex => {
                 Environment.Exit(0);
                 return Task.CompletedTask;
             };
+            cl.StopAsync().Wait();
         }
     }
 }

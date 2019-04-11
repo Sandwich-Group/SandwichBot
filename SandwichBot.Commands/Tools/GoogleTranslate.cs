@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -12,7 +13,8 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
 {
     public static class GoogleTranslate
     {
-        private const string ApiEndpoint = "https://translate.google.com/translate_a/single";
+        private const string TranslateEndpoint = "https://translate.google.com/translate_a/single";
+        private const string TtsEndpoint = "https://translate.google.com/translate_tts";
         private static readonly Dictionary<string, string> Languages = new Dictionary<string, string> {
             {"auto", "Automatic"}, {"af", "Afrikaans"}, {"sq", "Albanian"}, {"am", "Amharic"}, {"ar", "Arabic"}, {"hy", "Armenian"},
             {"az", "Azerbaijani"}, {"eu", "Basque"}, {"be", "Belarusian"}, {"bn", "Bengali"}, {"bs", "Bosnian"}, {"bg", "Bulgarian"},
@@ -40,10 +42,7 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
 
         public static async Task<string> Translate(string query, string to = "en", string from = "auto")
         {
-            if (cachedTtk is null || Convert.ToInt32(cachedTtk.Split('.')[0]) != UnixEpoch / (1000*60*60))
-                cachedTtk = await DownloadTTK();
-
-            string token = GenerateToken(query, cachedTtk);
+            string token = GenerateToken(query, await GetTTK());
 
             string dt = string.Join("&", new [] { "at", "bd", "ex", "ld", "md", "qca", "rw", "rm", "ss", "t" }.Select(x => $"dt={x}"));
             string queryString = $"?client=webapp&sl={from}&tl={to}&hl={to}&{dt}&pc=1&otf=1&ssel=0&tsel=0&kc=1&tk={token}&q={WebUtility.UrlEncode(query)}";
@@ -52,9 +51,30 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
             var wc = new WebClient {
                 Headers = { [HttpRequestHeader.UserAgent] = "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0"  }
             };
-            string jsonData = await wc.DownloadStringTaskAsync(ApiEndpoint + queryString);
+            string jsonData = await wc.DownloadStringTaskAsync(TranslateEndpoint + queryString);
             var data = (JArray)JsonConvert.DeserializeObject(jsonData);
             return string.Join(string.Empty, data[0].Select(x => ((JValue)x[0]).Value?.ToString()));
+        }
+
+        public static async Task<byte[]> TextToSpeech(string query, string language = "en")
+        {
+            string token = GenerateToken(query, await GetTTK());
+
+            string queryString = $"?ie=UTF-8&q={WebUtility.UrlEncode(query)}&tl={language}&total=1&idx=0&textlen={query.Length-1}&tk={token}&client=webapp";
+
+            // adding user-agent somehow fixes unicode inputs.
+            var wc = new WebClient {
+                Headers = { [HttpRequestHeader.UserAgent] = "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0"  }
+            };
+            return await wc.DownloadDataTaskAsync(TtsEndpoint + queryString);
+        }
+
+        private static async Task<string> GetTTK()
+        {
+            if (cachedTtk is null || Convert.ToInt32(cachedTtk.Split('.')[0]) != UnixEpoch / (1000*60*60))
+                cachedTtk = await DownloadTTK();
+
+            return cachedTtk;
         }
 
         private static async Task<string> DownloadTTK()
