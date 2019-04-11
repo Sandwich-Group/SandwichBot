@@ -1,5 +1,8 @@
 using System;
+using System.Threading.Tasks;
+using Discord.WebSocket;
 using HoLLy.DiscordBot.Commands;
+using HoLLy.DiscordBot.Commands.DependencyInjection;
 using HoLLy.DiscordBot.Sandwich.Tools;
 
 // ReSharper disable UnusedMember.Global
@@ -22,6 +25,16 @@ namespace HoLLy.DiscordBot.Sandwich
             }
 
             return GoogleTranslate.Translate(src).Result;
+        }
+
+        [Command(200, "stop")]
+        public static void StopBot([DI] DiscordSocketClient cl)
+        {
+            cl.StopAsync().Wait();
+            cl.Disconnected += ex => {
+                Environment.Exit(0);
+                return Task.CompletedTask;
+            };
         }
     }
 }
