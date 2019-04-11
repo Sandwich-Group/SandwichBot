@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -47,9 +46,13 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
             string token = GenerateToken(query, cachedTtk);
 
             string dt = string.Join("&", new [] { "at", "bd", "ex", "ld", "md", "qca", "rw", "rm", "ss", "t" }.Select(x => $"dt={x}"));
-            string queryString = $"?client=webapp&sl={from}&th={to}&hl={to}&{dt}&source=bh&ssel=0&tsel=0&kc=1&tk={token}&q={HttpUtility.UrlEncode(query)}";
+            string queryString = $"?client=webapp&sl={from}&tl={to}&hl={to}&{dt}&pc=1&otf=1&ssel=0&tsel=0&kc=1&tk={token}&q={WebUtility.UrlEncode(query)}";
 
-            string jsonData = await new WebClient().DownloadStringTaskAsync(ApiEndpoint + queryString);
+            // adding user-agent somehow fixes unicode inputs.
+            var wc = new WebClient {
+                Headers = { [HttpRequestHeader.UserAgent] = "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0"  }
+            };
+            string jsonData = await wc.DownloadStringTaskAsync(ApiEndpoint + queryString);
             var data = (JArray)JsonConvert.DeserializeObject(jsonData);
             return string.Join(string.Empty, data[0].Select(x => ((JValue)x[0]).Value?.ToString()));
         }
