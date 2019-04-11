@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using HoLLy.DiscordBot.Commands;
@@ -40,6 +43,34 @@ namespace HoLLy.DiscordBot.Sandwich
                 bytes = GoogleTranslate.TextToSpeech(src).Result;
 
             msg.Channel.SendFileAsync(new MemoryStream(bytes), "audio.mp3").Wait();
+        }
+
+        [Command("tr-langs", "Lists all supported languages for translation and text-to-speech")]
+        public static string TranslateLanguages()
+        {
+            const int cols = 5;
+            var items = GoogleTranslate.Languages.Select(x => (x.Key, x.Value)).ToArray();
+
+            var lens = new int[cols];
+            for (int i = 0; i < cols; i++) {
+                for (int j = i; j < items.Length; j += cols) {
+                    var pair = items[j];
+                    var str = $"{pair.Key}: {pair.Value}";
+                    lens[i] = Math.Max(lens[i], str.Length);
+                }
+            }
+
+            var sb = new StringBuilder();
+            for (int i = 0; i < items.Length; i++) {
+                var pair = items[i];
+                bool isLast = i % cols == cols  - 1;
+                sb.Append($"{pair.Key}: {pair.Value}".PadRight(isLast ? 0 : lens[i % cols] + 1));
+
+                if (isLast) sb.AppendLine();
+            }
+
+            Console.WriteLine(sb.Length);
+            return $"```{sb}```";
         }
 
         [Command(200, "stop")]
