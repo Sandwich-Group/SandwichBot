@@ -37,6 +37,8 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
 
         private static int UnixEpoch => (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
 
+        public static bool SupportsLanguage(string dst) => Languages.ContainsKey(dst);
+
         public static async Task<string> Translate(string query, string to = "en", string from = "auto")
         {
             if (cachedTtk is null || Convert.ToInt32(cachedTtk.Split('.')[0]) != UnixEpoch / (1000*60*60))
@@ -49,7 +51,7 @@ namespace HoLLy.DiscordBot.Sandwich.Tools
 
             string jsonData = await new WebClient().DownloadStringTaskAsync(ApiEndpoint + queryString);
             var data = (JArray)JsonConvert.DeserializeObject(jsonData);
-            return string.Join(string.Empty, data[0].Select(x => ((JValue)x[0]).Value.ToString()));
+            return string.Join(string.Empty, data[0].Select(x => ((JValue)x[0]).Value?.ToString()));
         }
 
         private static async Task<string> DownloadTTK()
