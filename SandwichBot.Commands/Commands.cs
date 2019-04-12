@@ -69,7 +69,6 @@ namespace HoLLy.DiscordBot.Sandwich
                 if (isLast) sb.AppendLine();
             }
 
-            Console.WriteLine(sb.Length);
             return $"```{sb}```";
         }
 
