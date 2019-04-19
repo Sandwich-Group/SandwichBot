@@ -82,7 +82,7 @@ namespace HoLLy.DiscordBot.Sandwich
             cl.StopAsync().Wait();
         }
 
-        [Command("roll")]
+        [Command("roll", "Rolls a random number. Accepts DnD-style dice and number parameters.")]
         public static string Roll(string arg)
         {
             var split = arg.Split(' ');
