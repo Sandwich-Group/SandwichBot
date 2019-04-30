@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using HoLLy.DiscordBot.Commands;
 using HoLLy.DiscordBot.Commands.DependencyInjection;
 using HoLLy.DiscordBot.Sandwich.Tools;
+using NCalc2;
 
 // ReSharper disable UnusedMember.Global
 
@@ -105,6 +106,19 @@ namespace HoLLy.DiscordBot.Sandwich
 
             // if no ndn was given, just use parameter as 1dn
             return rand.Next(int.TryParse(split[0], out int maxValue) ? maxValue : 100).ToString();
+        }
+
+        [Command("calc", "Evaluates a mathematical expression")]
+        public static string Calculate(string input)
+        {
+            try {
+                object evaluated = new Expression(input).Evaluate();
+                return evaluated is string s
+                    ? $"`{s}`"
+                    : evaluated.ToString();
+            } catch (Exception e) {
+                return e.Message;
+            }
         }
     }
 }
