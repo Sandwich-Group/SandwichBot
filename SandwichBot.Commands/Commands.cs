@@ -120,5 +120,18 @@ namespace HoLLy.DiscordBot.Sandwich
                 return e.Message;
             }
         }
+
+        [Command("ud", "Gets a definition from Urban Dictionary")]
+        public static string UrbanDictionary(string term)
+        {
+            var list = Tools.UrbanDictionary.GetDefinition(term).Result;
+            if (list.Length == 0)
+                return "No definition found.";
+
+            var def = list[0];
+            return $"{removeLinks(def.Definition.Escape())}\n> *{removeLinks(def.Example.Escape())}*";
+
+            string removeLinks(string s) => s.Replace("[", string.Empty).Replace("]", string.Empty);
+        }
     }
 }
