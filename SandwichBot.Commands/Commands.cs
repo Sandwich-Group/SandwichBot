@@ -14,7 +14,7 @@ using NCalc2;
 
 namespace HoLLy.DiscordBot.Sandwich
 {
-    public static class Commands
+    public static partial class Commands
     {
         [Command("ping", "Returns 'Pong!'")]
         public static string Ping() => "Pong!";
