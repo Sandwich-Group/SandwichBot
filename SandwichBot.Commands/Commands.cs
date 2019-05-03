@@ -135,6 +135,8 @@ namespace HoLLy.DiscordBot.Sandwich
         }
 
         [Command("img", "Searches for an image on DuckDuckGo")]
-        public static string ImageSearch(string query) => DuckDuckGoNoApi.SearchImage(query).ToString();
+        public static string ImageSearch(string query) => query.Length >= 3
+                ? DuckDuckGoNoApi.SearchImage(query).Result.ToString()
+                : "Search query too short";
     }
 }
