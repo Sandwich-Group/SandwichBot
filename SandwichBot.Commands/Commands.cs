@@ -133,5 +133,8 @@ namespace HoLLy.DiscordBot.Sandwich
 
             string removeLinks(string s) => s.Replace("[", string.Empty).Replace("]", string.Empty);
         }
+
+        [Command("img", "Searches for an image on DuckDuckGo")]
+        public static string ImageSearch(string query) => DuckDuckGoNoApi.SearchImage(query).ToString();
     }
 }
