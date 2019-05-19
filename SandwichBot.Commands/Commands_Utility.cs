@@ -11,6 +11,9 @@ namespace HoLLy.DiscordBot.Sandwich
         [Command("ping", "Returns 'Pong!'")]
         public static string Ping() => "Pong!";
 
+        [Command("choose", "Picks a random word")]
+        public static string Choose(string[] args) => args[new Random().Next(args.Length)];
+
         [Command("roll", "Rolls a random number. Accepts DnD-style dice and number parameters.")]
         public static string Roll(string arg)
         {
