@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using HoLLy.DiscordBot.Commands;
@@ -51,5 +52,17 @@ namespace HoLLy.DiscordBot.Sandwich
                 return e.Message;
             }
         }
+
+        [Command("faq", "Returns a hardcoded FAQ item")]
+        public static string Faq(string key)
+        {
+            key = key.ToLowerInvariant();
+            return Constants.FAQ.ContainsKey(key)
+                ? Constants.FAQ[key]
+                : "FAQ entry not found. Try the faq-items command.";
+        }
+
+        [Command("faq-items", "Lists all items in the hardcoded FAQ")]
+        public static string FaqItems() => string.Join(", ", Constants.FAQ.Keys.Select(k => $"`{k}`"));
     }
 }
