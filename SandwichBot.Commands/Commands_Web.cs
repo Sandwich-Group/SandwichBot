@@ -31,5 +31,36 @@ namespace HoLLy.DiscordBot.Sandwich
 
         [Command("img", "Searches for an image on DuckDuckGo")]
         public static string ImageSearch(string query) => DuckDuckGoNoApi.SearchImage(query).Result.ToString();
+
+        [Command("cur", "Converts a currency")]
+        public static string ConvertCurrency(string parameter)
+        {
+            if (parameter.IndexOf(' ') == -1)
+                return usage();    // TODO: try 1.23USD
+
+            string firstPart = parameter.Substring(0, parameter.IndexOf(' '));
+            string secondPart = parameter.Substring(parameter.IndexOf(' ') + 1);
+            string to, from;
+
+            if (double.TryParse(firstPart, out double value)) {
+                from = secondPart;
+                to = "EUR";
+            } else {
+                to = firstPart;
+                if (secondPart.IndexOf(' ') == -1)
+                    return usage();    // TODO: try 1.23USD
+
+                if (!double.TryParse(secondPart.Substring(0, secondPart.IndexOf(' ')), out value))
+                    return usage();
+
+                from = secondPart.Substring(secondPart.IndexOf(' ') + 1);
+            }
+
+            // TODO: convert symbols?
+
+            return $"{value} {from} = {ExchangeRate.ConvertCurrency(value, from, to).Result} {to}";
+
+            string usage() => "Parameter format: `<amount> `<from>` or `<to> <amount> <from>`";
+        }
     }
 }
